@@ -51,7 +51,7 @@ Cilj ove podele je da se izbegne jedan prevelik dokument koji sadrži sve podatk
     closed_time: Date
   }
 }
-```js
+```
 ## Kolekcija `companies`
 
 ```js
@@ -71,7 +71,7 @@ Cilj ove podele je da se izbegne jedan prevelik dokument koji sadrži sve podatk
 
   specialities: [String]
 }
-```js
+```
 ## Kolekcija `job_metadata`
 ```js
 {
@@ -98,7 +98,7 @@ Cilj ove podele je da se izbegne jedan prevelik dokument koji sadrži sve podatk
     }
   ]
 }
-```js
+```
 Veze izmedju kolekcija
 job_postings.company_id → companies.company_id
 job_postings.job_id → job_metadata.job_id
