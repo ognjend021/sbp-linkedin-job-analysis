@@ -1,4 +1,4 @@
-##Skripta za transformaciju kolekcije job_postings u job_postings_v2
+## Skripta za transformaciju kolekcije job_postings u job_postings_v2
 
 Izvor: linkedin_jobs.job_postings + companies + job_metadata
 Cilj: denormalizovana analitička kolekcija za HR upite
@@ -95,7 +95,7 @@ db.job_postings.aggregate([
   }
 ], { allowDiskUse: true });
 ```
-##Skripta za kreiranje V2 kolekcije industry_skill_stats_v2
+## Skripta za kreiranje V2 kolekcije industry_skill_stats_v2
 
 Izvor: linkedin_jobs.job_metadata
 Cilj: precomputed kolekcija za HR4
@@ -206,27 +206,32 @@ db.job_metadata.aggregate([
   { $unwind: "$industry_stats" },
   {
     $project: {
-      _id: 0,
-      industry: "$industry_stats.industry",
-      total_jobs: "$industry_stats.total_jobs",
-      distinct_skill_count: "$industry_stats.distinct_skill_count",
-      avg_skills_per_job: "$industry_stats.avg_skills_per_job",
-      top_skills: {
+        _id: "$industry_stats.industry",
+        industry: "$industry_stats.industry",
+        total_jobs: "$industry_stats.total_jobs",
+        distinct_skill_count: "$industry_stats.distinct_skill_count",
+        avg_skills_per_job: "$industry_stats.avg_skills_per_job",
+        top_skills: {
         $let: {
-          vars: {
+            vars: {
             matched: {
-              $first: {
+                $first: {
                 $filter: {
-                  input: "$top_skills",
-                  as: "ts",
-                  cond: { $eq: ["$$ts.industry", "$industry_stats.industry"] }
+                    input: "$top_skills",
+                    as: "ts",
+                    cond: {
+                    $eq: [
+                        "$$ts.industry",
+                        "$industry_stats.industry"
+                    ]
+                    }
                 }
-              }
+                }
             }
-          },
-          in: "$$matched.top_skills"
+            },
+            in: "$$matched.top_skills"
         }
-      }
+        }
     }
   },
   {
@@ -243,4 +248,22 @@ db.job_metadata.aggregate([
     }
   }
 ], { allowDiskUse: true });
+```
+
+## Kod za kreiranje index-a za obe kolekcije
+
+Nakon formiranja V2 kolekcija kreirani su indeksi nad atributima koji se najčešće koriste u filtriranju, grupisanju i sortiranju analitičkih upita.
+
+```js
+db.job_postings_v2.createIndex({ work_type: 1 });
+db.job_postings_v2.createIndex({ "metrics.views": 1 });
+db.job_postings_v2.createIndex({ "metrics.conversion_rate": 1 });
+db.job_postings_v2.createIndex({ "company.company_size": 1 });
+db.job_postings_v2.createIndex({ "company.employee_count": 1 });
+db.job_postings_v2.createIndex({ "salary.normalized_salary": 1 });
+db.job_postings_v2.createIndex({ "skills.skill_name": 1 });
+db.job_postings_v2.createIndex({ "industries.industry_name": 1 });
+
+db.industry_skill_stats_v2.createIndex({ distinct_skill_count: -1 });
+db.industry_skill_stats_v2.createIndex({ avg_skills_per_job: -1 });
 ```

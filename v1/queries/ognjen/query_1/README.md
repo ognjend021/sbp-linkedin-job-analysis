@@ -1,5 +1,4 @@
-## Kolekcija Da li različiti tipovi rada ostvaruju različitu efikasnost oglasa,  posmatrano kroz prosečan broj pregleda, prosečan broj prijava  i stopu konverzije prijava u odnosu na preglede?
-
+## Da li različiti tipovi rada (Full-time, Part-time, Contract…) ostvaruju različitu efikasnost oglasa, posmatrano kroz prosečan broj pregleda, prosečan broj prijava i stopu konverzije prijava u odnosu na preglede?
 ```js
 db.job_postings.aggregate([
   {
